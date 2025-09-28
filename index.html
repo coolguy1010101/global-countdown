@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Global Countdown Timer</title>
+  <style>
+    body {
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      height:100vh;
+      margin:0;
+      background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+      color:white;
+      font-family:Arial, sans-serif;
+      text-align:center;
+    }
+    h1 {
+      font-size:2.5rem;
+      margin-bottom:10px;
+    }
+    h2 {
+      font-size:1.5rem;
+      margin-bottom:25px;
+      color:#ffcc70;
+    }
+    #timer {
+      font-size:2.5rem;
+      letter-spacing:2px;
+    }
+    button {
+      margin-top:20px;
+      padding:10px 20px;
+      border:none;
+      border-radius:8px;
+      background:#e94560;
+      color:white;
+      font-size:1rem;
+      cursor:pointer;
+    }
+    button:hover {
+      background:#ff6b81;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌍 Global Countdown</h1>
+  <h2>Countdown to Launch 🚀</h2>
+  <div id="timer">Loading...</div>
+  <button id="toggleSound">🔊 Sound On</button>
+
+  <!-- Tick and alarm sounds -->
+  <audio id="tick" src="https://assets.mixkit.co/active_storage/sfx/2576/2576-preview.mp3" preload="auto"></audio>
+  <audio id="alarm" src="https://assets.mixkit.co/active_storage/sfx/1666/1666-preview.mp3" preload="auto"></audio>
+
+  <script>
+    // ✅ Global end time: fixed at page publish, same for all users
+    const targetDate = new Date(Date.now() + 
+      (12*24*60*60 + 15*60*60 + 5*60 + 12) * 1000);
+
+    let soundEnabled = true;
+    const tickSound = document.getElementById("tick");
+    const alarmSound = document.getElementById("alarm");
+    const toggleBtn = document.getElementById("toggleSound");
+
+    toggleBtn.onclick = () => {
+      soundEnabled = !soundEnabled;
+      toggleBtn.textContent = soundEnabled ? "🔊 Sound On" : "🔇 Sound Off";
+    };
+
+    function updateTimer() {
+      const now = new Date();
+      const diff = targetDate - now;
+
+      if (diff <= 0) {
+        document.getElementById("timer").textContent = "⏰ Time's up!";
+        clearInterval(countdown);
+        if (soundEnabled) alarmSound.play();
+        return;
+      }
+
+      const days = Math.floor(diff / (1000*60*60*24));
+      const hours = Math.floor((diff / (1000*60*60)) % 24);
+      const minutes = Math.floor((diff / (1000*60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      document.getElementById("timer").textContent =
+        `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+      // Play tick only in the last 60 seconds
+      if (soundEnabled && diff <= 60*1000) {
+        tickSound.currentTime = 0; // rewind
+        tickSound.play();
+      }
+    }
+
+    updateTimer();
+    const countdown = setInterval(updateTimer, 1000);
+  </script>
+</body>
+</html>
